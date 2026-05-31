@@ -20,4 +20,4 @@ services:
       - key: JWT_EXPIRES_IN
         value: 7d
       - key: FRONTEND_URL
-        value: https://eventhub-frontend-8wwbss9aq-ragadeepans-projects.vercel.app
+        value: https://eventhub-frontend-nu.vercel.app
