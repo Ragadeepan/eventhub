@@ -42,6 +42,7 @@ const allowedOrigins = [
   'http://localhost:5173',
   'https://eventhub.io',
   'https://eventhub-frontend-nu.vercel.app',
+  'https://eventhub-d8306ea9.netlify.app',
 ];
 app.use(cors({
   origin: (origin, callback) => {
