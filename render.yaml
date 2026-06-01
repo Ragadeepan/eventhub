@@ -20,4 +20,12 @@ services:
       - key: JWT_EXPIRES_IN
         value: 7d
       - key: FRONTEND_URL
-        value: https://eventhub-frontend-nu.vercel.app
+        value: https://eventhub-d8306ea9.netlify.app
+      - key: FIREBASE_PROJECT_ID
+        value: eventhub-a1b0c
+      - key: FIREBASE_CLIENT_EMAIL
+        value: firebase-adminsdk-fbsvc@eventhub-a1b0c.iam.gserviceaccount.com
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false
+      - key: FIREBASE_PRIVATE_KEY_ID
+        value: aef5c8c232523512ea160be4b59c7895e3e346d7
