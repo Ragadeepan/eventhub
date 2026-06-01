@@ -24,9 +24,9 @@ export const formatEventDate = (startDate, endDate) => {
   return `${format(start, 'MMM d')} – ${format(end, 'MMM d, yyyy')}`;
 };
 
-export const formatCurrency = (amount, currency = 'USD') => {
+export const formatCurrency = (amount, currency = 'INR') => {
   if (amount === 0) return 'Free';
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency, minimumFractionDigits: 0 }).format(amount);
+  return new Intl.NumberFormat('en-IN', { style: 'currency', currency, minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
 };
 
 export const formatNumber = (num) => {
