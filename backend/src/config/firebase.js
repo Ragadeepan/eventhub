@@ -1,27 +1,49 @@
-import admin from 'firebase-admin';
+import https from 'https';
+import jwt from 'jsonwebtoken';
 
-const isConfigured = !!(process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY);
+const PROJECT_ID = process.env.FIREBASE_PROJECT_ID || 'eventhub-a1b0c';
 
-export const initFirebaseAdmin = () => {
-  if (!isConfigured) return null;
-  if (admin.apps.length) return admin.apps[0];
+// Fetch Google's public signing keys for Firebase tokens
+let cachedKeys = null;
+let keyExpiry = 0;
 
-  const app = admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId:   process.env.FIREBASE_PROJECT_ID,
-      privateKey:  process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    }),
-  });
-
-  console.log('✅ Firebase Admin initialized');
-  return app;
-};
+const getGooglePublicKeys = () => new Promise((resolve, reject) => {
+  if (cachedKeys && Date.now() < keyExpiry) return resolve(cachedKeys);
+  https.get('https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com', (res) => {
+    let data = '';
+    res.on('data', chunk => data += chunk);
+    res.on('end', () => {
+      try {
+        cachedKeys = JSON.parse(data);
+        // Cache-Control header gives expiry; default 1 hour
+        const cc = res.headers['cache-control'] || '';
+        const maxAge = parseInt((cc.match(/max-age=(\d+)/) || [])[1] || '3600');
+        keyExpiry = Date.now() + maxAge * 1000;
+        resolve(cachedKeys);
+      } catch (e) { reject(e); }
+    });
+  }).on('error', reject);
+});
 
 export const verifyFirebaseToken = async (idToken) => {
-  if (!isConfigured) throw new Error('Firebase is not configured on this server');
-  if (!admin.apps.length) initFirebaseAdmin();
-  return admin.auth().verifyIdToken(idToken);
+  const keys = await getGooglePublicKeys();
+  const header = JSON.parse(Buffer.from(idToken.split('.')[0], 'base64').toString());
+  const cert = keys[header.kid];
+  if (!cert) throw new Error('Invalid Firebase token: unknown key');
+
+  const decoded = jwt.verify(idToken, cert, {
+    algorithms: ['RS256'],
+    audience: PROJECT_ID,
+    issuer: `https://securetoken.google.com/${PROJECT_ID}`,
+  });
+
+  return {
+    uid:     decoded.uid || decoded.sub,
+    email:   decoded.email,
+    name:    decoded.name,
+    picture: decoded.picture,
+  };
 };
 
-export default admin;
+export const initFirebaseAdmin = () => null;
+export default {};
