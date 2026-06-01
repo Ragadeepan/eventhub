@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore.js';
+import { firebaseConfigured } from '../../lib/firebase.js';
 import Button from '../../components/ui/Button.jsx';
 import Input from '../../components/ui/Input.jsx';
 import toast from 'react-hot-toast';
@@ -109,17 +110,20 @@ export default function LoginPage() {
             <p className="text-slate-400">Sign in to your EventHub account</p>
           </div>
 
-          {/* Google sign-in */}
-          <Button variant="secondary" fullWidth size="lg" isLoading={googleLoading} onClick={handleGoogleLogin} className="mb-6">
-            <GoogleIcon />
-            Continue with Google
-          </Button>
-
-          <div className="flex items-center gap-4 mb-6">
-            <div className="flex-1 h-px bg-white/10" />
-            <span className="text-slate-500 text-sm">or continue with email</span>
-            <div className="flex-1 h-px bg-white/10" />
-          </div>
+          {/* Google sign-in — only show when Firebase is configured */}
+          {firebaseConfigured && (
+            <>
+              <Button variant="secondary" fullWidth size="lg" isLoading={googleLoading} onClick={handleGoogleLogin} className="mb-6">
+                <GoogleIcon />
+                Continue with Google
+              </Button>
+              <div className="flex items-center gap-4 mb-6">
+                <div className="flex-1 h-px bg-white/10" />
+                <span className="text-slate-500 text-sm">or continue with email</span>
+                <div className="flex-1 h-px bg-white/10" />
+              </div>
+            </>
+          )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <Input

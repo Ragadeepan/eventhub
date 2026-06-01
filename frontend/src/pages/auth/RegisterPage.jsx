@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Mail, Lock, Eye, EyeOff, User, ArrowRight, Check } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore.js';
+import { firebaseConfigured } from '../../lib/firebase.js';
 import Button from '../../components/ui/Button.jsx';
 import Input from '../../components/ui/Input.jsx';
 import toast from 'react-hot-toast';
@@ -143,16 +144,19 @@ export default function RegisterPage() {
             ))}
           </div>
 
-          {/* Google signup */}
-          <Button variant="secondary" fullWidth size="lg" isLoading={googleLoading} onClick={handleGoogleSignup} className="mb-6">
-            <GoogleIcon /> Continue with Google
-          </Button>
-
-          <div className="flex items-center gap-4 mb-6">
-            <div className="flex-1 h-px bg-white/10" />
-            <span className="text-slate-500 text-sm">or with email</span>
-            <div className="flex-1 h-px bg-white/10" />
-          </div>
+          {/* Google signup — only show when Firebase is configured */}
+          {firebaseConfigured && (
+            <>
+              <Button variant="secondary" fullWidth size="lg" isLoading={googleLoading} onClick={handleGoogleSignup} className="mb-6">
+                <GoogleIcon /> Continue with Google
+              </Button>
+              <div className="flex items-center gap-4 mb-6">
+                <div className="flex-1 h-px bg-white/10" />
+                <span className="text-slate-500 text-sm">or with email</span>
+                <div className="flex-1 h-px bg-white/10" />
+              </div>
+            </>
+          )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">

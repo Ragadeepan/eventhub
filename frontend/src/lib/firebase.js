@@ -27,7 +27,7 @@ if (isConfigured) {
 const googleProvider = isConfigured ? new GoogleAuthProvider() : null;
 if (googleProvider) googleProvider.setCustomParameters({ prompt: 'select_account' });
 
-export { auth };
+export { auth, isConfigured as firebaseConfigured };
 
 export const signInWithGoogle = () => {
   if (!auth || !googleProvider) throw new Error('Google login is not configured. Please add Firebase credentials.');
