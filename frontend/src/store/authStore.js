@@ -75,16 +75,17 @@ export const useAuthStore = create(
       },
 
       initialize: async () => {
+        // Always resolve immediately so the app renders even if backend is cold-starting
+        set({ isInitialized: true });
         const token = localStorage.getItem('eventhub_token');
         if (token) {
-          // Set initialized immediately so the app renders; fetch user in background
-          set({ token, isInitialized: true });
           try {
             const data = await api.get('/auth/me');
-            set({ user: data.user });
-          } catch { set({ user: null, token: null }); localStorage.removeItem('eventhub_token'); }
-        } else {
-          set({ isInitialized: true });
+            set({ user: data.user, token });
+          } catch {
+            set({ user: null, token: null });
+            localStorage.removeItem('eventhub_token');
+          }
         }
       },
 

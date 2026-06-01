@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Twitter, Github, Linkedin, Instagram, Mail, Phone, MapPin } from 'lucide-react';
+import { Twitter, Github, Linkedin, Instagram, Mail, Phone, MapPin, Heart } from 'lucide-react';
 
 const footerLinks = {
   Product: [
