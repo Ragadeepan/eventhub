@@ -4,6 +4,7 @@ import { AnimatePresence } from 'framer-motion';
 import { useAuthStore } from './store/authStore.js';
 import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
 import PageLoader from './components/ui/PageLoader.jsx';
+import ServerWakeBanner from './components/ui/ServerWakeBanner.jsx';
 
 // Lazy-loaded pages for code splitting
 const LandingPage        = lazy(() => import('./pages/LandingPage.jsx'));
@@ -59,6 +60,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <ServerWakeBanner />
       <AnimatePresence mode="wait">
         <Suspense fallback={<PageLoader />}>
           <Routes>

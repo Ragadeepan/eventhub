@@ -100,22 +100,22 @@ export default function EventsPage() {
                 )}
               </div>
 
-              <div className="flex gap-2">
-                <Button variant="secondary" size="md" onClick={() => setFiltersOpen(!filtersOpen)} className="gap-2">
+              <div className="flex gap-2 flex-wrap sm:flex-nowrap">
+                <Button variant="secondary" size="md" onClick={() => setFiltersOpen(!filtersOpen)} className="gap-2 shrink-0">
                   <SlidersHorizontal className="w-4 h-4" />
-                  Filters
+                  <span className="hidden sm:inline">Filters</span>
                   {activeFiltersCount > 0 && <span className="w-5 h-5 rounded-full bg-brand-500 text-white text-xs flex items-center justify-center">{activeFiltersCount}</span>}
                 </Button>
 
                 <select
                   value={params.sort}
                   onChange={(e) => updateParam('sort', e.target.value)}
-                  className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-500"
+                  className="flex-1 sm:flex-none bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-500 min-w-0"
                 >
                   {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
 
-                <div className="flex border border-white/10 rounded-xl overflow-hidden">
+                <div className="hidden sm:flex border border-white/10 rounded-xl overflow-hidden shrink-0">
                   <button onClick={() => setViewMode('grid')} className={cn('px-3 py-2 transition-colors', viewMode === 'grid' ? 'bg-brand-500/20 text-brand-400' : 'text-slate-400 hover:text-white')}>
                     <Grid3X3 className="w-4 h-4" />
                   </button>
@@ -128,13 +128,69 @@ export default function EventsPage() {
           </div>
         </div>
 
+        {/* Mobile filter bottom sheet */}
+        {filtersOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setFiltersOpen(false)}
+            className="fixed inset-0 z-40 bg-black/60 lg:hidden"
+          >
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25 }}
+              onClick={(e) => e.stopPropagation()}
+              className="absolute bottom-0 left-0 right-0 bg-surface-50 border-t border-white/10 rounded-t-3xl p-5 max-h-[80vh] overflow-y-auto"
+            >
+              <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-5" />
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-white">Filters</h3>
+                {activeFiltersCount > 0 && <button onClick={() => setSearchParams({})} className="text-xs text-brand-400">Clear all</button>}
+              </div>
+              <div className="space-y-5">
+                <div>
+                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Category</p>
+                  <div className="flex flex-wrap gap-2">
+                    <button onClick={() => updateParam('category', '')} className={cn('px-3 py-1.5 rounded-xl text-sm transition-colors', !params.category ? 'bg-brand-500 text-white' : 'bg-white/10 text-slate-400')}>All</button>
+                    {(categoriesData?.categories || []).map(cat => (
+                      <button key={cat._id} onClick={() => updateParam('category', cat._id)} className={cn('px-3 py-1.5 rounded-xl text-sm transition-colors flex items-center gap-1.5', params.category === cat._id ? 'bg-brand-500 text-white' : 'bg-white/10 text-slate-400')}>
+                        <span>{cat.icon}</span>{cat.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Event Type</p>
+                  <div className="flex flex-wrap gap-2">
+                    {EVENT_TYPES.map(t => (
+                      <button key={t.value} onClick={() => updateParam('type', t.value)} className={cn('px-3 py-1.5 rounded-xl text-sm transition-colors', params.type === t.value ? 'bg-brand-500 text-white' : 'bg-white/10 text-slate-400')}>{t.label}</button>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  {[{ key: 'isFeatured', label: '⭐ Featured' }, { key: 'isFree', label: '🆓 Free' }].map(({ key, label }) => (
+                    <label key={key} className="flex items-center gap-2 cursor-pointer">
+                      <input type="checkbox" checked={!!searchParams.get(key)} onChange={(e) => updateParam(key, e.target.checked ? 'true' : '')} className="rounded border-white/20 bg-white/5 text-brand-500 w-4 h-4" />
+                      <span className="text-sm text-slate-300">{label}</span>
+                    </label>
+                  ))}
+                </div>
+                <button onClick={() => setFiltersOpen(false)} className="w-full py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-2xl font-medium transition-colors">Apply Filters</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex gap-8">
           {/* Sidebar filters */}
           {filtersOpen && (
             <motion.aside
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="hidden lg:block w-64 shrink-0"
+              className="hidden lg:block w-64 shrink-0 self-start"
             >
               <div className="glass-card p-5 sticky top-24 space-y-6">
                 <div className="flex items-center justify-between">
